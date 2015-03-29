@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+    <package name="irisnote-support" namespace="/" extends="irisnote">
+
+        <action name="Register_*" method="execute" class="com.irisnote.controllers.RegisterUserAction">
+            <result name="input" type="freemarker">/templates/Register.ftl</result>
+            <result name="cancel" type="redirect">/Login.action</result>
+            <result name="success" type="redirect">/Login.action</result>
+        </action>
+
+        <action name="Login_*" method="execute" class="com.irisnote.controllers.LoginAction">
+            <result name="input" type="freemarker">/templates/Login.ftl</result>
+            <result name="success" type="redirect">/Main.action</result>
+            <result name="password" type="freemarker">/templates/Password.ftl</result>
+            <result name="valid" type="httpheader">
+                <param name="status">200</param>
+            </result>
+            <result name="invalid" type="httpheader">
+                <param name="status">401</param>
+            </result>
+            <result name="ssl_required" type="httpheader">
+                <param name="status">403</param>
+            </result>
+        </action>
+
+        <action name="PrivateLogin_*" method="privateLogin" class="com.irisnote.controllers.LoginAction">
+            <result name="valid" type="httpheader">
+                <param name="status">200</param>
+            </result>
+            <result name="invalid" type="httpheader">
+                <param name="status">401</param>
+            </result>
+            <result name="connectionerror" type="freemarker">/templates/ConnectionError.ftl</result>
+            <result name="ssl_required" type="httpheader">
+                <param name="status">403</param>
+            </result>
+        </action>
+
+        <action name="Logout" method="logout" class="com.irisnote.controllers.LoginAction">
+            <result name="success" type="redirect">/Login.action</result>
+        </action>
+
+        <action name="Main" method="execute" class="com.irisnote.controllers.MainAction">
+            <result name="success" type="freemarker">/templates/mainLayout.ftl</result>
+        </action>
+
+        <action name="Container_*" method="{1}" class="com.irisnote.controllers.ContainerAction">
+            <result name="success" type="freemarker">/templates/ContainerList.ftl</result>
+            <result name="metadata" type="freemarker">/templates/notebook/NotebookContents.ftl</result>
+            <result name="history" type="freemarker">/templates/ContainerHistory.ftl</result>
+        </action>
+
+
+        <action name="Resource_*" method="{1}" class="com.irisnote.controllers.ResourceAction">
+            <result name="resourcelist" type="redirect">/Container_getList.action</result>
+            <result name="success" type="freemarker">/templates/Success.ftl</result>
+            <result name="history" type="freemarker">/templates/ResourceHistory.ftl</result>
+        </action>
+
+        <action name="ResourceContent_*" method="retrieve" class="com.irisnote.controllers.ResourceAction">
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+                <param name="inputName">contentStream</param>
+                <param name="contentDisposition">attachment;filename="${displayName}"</param>
+                <param name="contentLength">${contentLength}</param>
+                <param name="bufferSize">1024</param>
+            </result>
+        </action>
+
+        <action name="Message_*" method="{1}" class="com.irisnote.controllers.MessageAction">
+            <result name="success" type="freemarker">/templates/MessageList.ftl</result>
+
+        </action>
+
+        <action name="ArchivedMessages" method="getReceivedMessages" class="com.irisnote.controllers.MessageAction">
+            <result name="success" type="freemarker">/templates/ArchivedMessageList.ftl</result>
+
+        </action>
+
+        <action name="User_*" method="{1}" class="com.irisnote.controllers.UserAction">
+            <result name="input" type="freemarker">/templates/CreateUser.ftl</result>
+            <result name="update" type="freemarker">/templates/UpdateUser.ftl</result>
+            <result name="userlist" type="freemarker">/templates/UserList.ftl</result>
+            <result name="success" type="freemarker">/templates/Success.ftl</result>
+            <result name="historylist" type="freemarker">/templates/UserHistory.ftl</result>
+            <result name="simpleuserlist" type="redirect">/SimpleUserList.action</result>
+            <result name="usergrouplist" type="freemarker">/templates/UserGroupList.ftl</result>
+            <result name="image" type="stream">
+                <param name="inputName">contentStream</param>
+                <param name="contentDisposition">attachment;filename="${filename}"</param>
+            </result>
+        </action>
+
+        <action name="SimpleUserList" method="getListByFrp" class="com.irisnote.controllers.UserAction">
+            <result name="userlist" type="freemarker">/templates/SimpleUserList.ftl</result>
+        </action>
+
+        <action name="Share_*" method="{1}" class="com.irisnote.controllers.ShareAction">
+            <result name="success" type="freemarker">/templates/Success.ftl</result>
+        </action>
+
+        <action name="Group_*" method="{1}" class="com.irisnote.controllers.GroupAction">
+            <result name="success" type="freemarker">/templates/Success.ftl</result>
+            <result name="grouplist" type="freemarker">/templates/SimpleGroupList.ftl</result>
+        </action>
+    </package>
+</struts>

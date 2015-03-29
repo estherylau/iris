@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Irisnote</title>
+<script language="javascript" src="/irisnote/static/js/jquery-1.7.2.min.js"></script>
+<script language="javascript" src="/irisnote/static/js/jquery-ui-1.8.22.custom.min.js"></script>
+<script language="javascript" src="/irisnote/static/js/iris.js"></script>
+<script language="javascript" src="/irisnote/static/js/jquery.transform2d.js"></script>
+<script language="javascript" src="/irisnote/static/js/jquery.color.js"></script>
+
+<!-- calls for contextMenu -->
+<script src="/irisnote/static/js/jquery.contextMenu.js"></script>
+<script src="/irisnote/static/js/jquery.ui.position.js"></script>
+<link href="/irisnote/static/css/jquery.contextMenu.css" rel="stylesheet" type="text/css"/>
+<!-- end calls for contextMenu -->
+
+<!-- calls for dragNdrop-->
+<link href="/irisnote/static/css/dragNdrop.css" rel="stylesheet" type="text/css"/>
+<!-- end calls for dragNdrop-->
+
+<!-- calls for roll-back tooltip -->
+<script src="/irisnote/static/js/jquery.tooltip.js"></script>
+<!-- end calls for roll-back tooltip -->
+
+<!-- calls for text editor -->
+<link rel="stylesheet" type="text/css" href="/irisnote/static/js/CLEditor1_3_0/jquery.cleditor.css"/>
+<script type="text/javascript" src="/irisnote/static/js/CLEditor1_3_0/jquery.min.js"></script>
+<script type="text/javascript" src="/irisnote/static/js/CLEditor1_3_0/jquery.cleditor.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#body").cleditor();
+    });
+</script>
+<!-- end calls for text editor -->
+
+
+<script type="text/javascript">
+function acceptShare(iid) {
+
+
+    $.post('Share_shareConfirm.action', 'invitationIdForShare=' + iid, function (data) {
+        //alert('you have shared: ' + iid);
+
+    });
+}
+
+$(document).ready(function () {
+
+    //activate all jQuery UI elements;
+    $(function () {
+
+        //drag and drop feature
+        var draggableContents = $("#outerDraggable").html();
+
+        $(".draggable").draggable({
+            revert:true,
+            revertDuration:0
+        });
+        $("#droppable").droppable({
+            tolerance:"touch",
+            drop:function (event, ui) {
+                $(this)
+                        .addClass("ui-state-highlight")
+                        .find("p")
+                        .html("Dropped!");
+                //$("#draggable").remove();
+                //$("#outerDraggable").append(draggableContents);
+                $('#dialogAddedFile').dialog('open');
+            }
+        });
+
+        // Accordion
+        $("#accordionNotebookInfo").accordion({ header:"h3" });
+        $('#toggleMe').click(function () {
+            $('.notebookInfoSlideToggle').toggle('slow', function () {
+                //alert('toggled');
+            });
+        });
+
+        // Accordion in notebook/NotebookContent.ftl
+        $("#accordionNotebookInfo_Notebook").accordion({ header:"h3" });
+        $('#toggleMe_Notebook').click(function () {
+            $('.notebookInfoSlideToggle_Notebook').toggle('slow', function () {
+                //alert('toggled');
+            });
+        });
+
+        // Tabs
+        $('#tabsFile').tabs();
+        $('#tabsContent').tabs();
+        $('#tabsReceivedSentMessage').tabs();
+
+
+        $('#showMessages').click(function (event) {
+            $('#tabsContent').tabs('select', 5);
+        }).css({
+                    color:'blue',
+                    cursor:'pointer'
+                });
+
+
+        // define dialogIrisnoteQuestion as JS object
+        $('#dialogIrisnoteQuestion').dialog({
+            autoOpen:false,
+            width:600,
+            modal:true,
+            buttons:{
+                "close":function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        // define dialogControlledVocabularyQuestion as JS object
+        $('#dialogControlledVocabularyQuestion').dialog({
+            autoOpen:false,
+            width:600,
+            modal:true,
+            buttons:{
+                "close":function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        // define dialogTemplatesQuestion as JS object
+        $('#dialogTemplatesQuestion').dialog({
+            autoOpen:false,
+            width:600,
+            modal:true,
+            buttons:{
+                "close":function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        // define dialogCollaborationQuestion as JS object
+        $('#dialogCollaborationQuestion').dialog({
+            autoOpen:false,
+            width:600,
+            modal:true,
+            buttons:{
+                "close":function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        // define dialogCreateNotebook as JS object
+        $('#dialogCreateNotebook').dialog({
+            autoOpen:false,
+            width:600,
+            modal:true,
+            buttons:{
+                "create notebook":function () {
+                    $.post('Container_create.action', $("#createNotebook").serialize(), function (data) {
+                        //alert('this is the data: '+data);
+                        $("#documentList").empty().append(data);
+                    });
+                    $(this).dialog("close");
+                },
+                "cancel":function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        // define dialogCreateFolder as JS object
+        $('#dialogCreateFolder').dialog({
+            autoOpen:false,
+            width:600,
+            modal:true,
+            buttons:{
+                "create folder":function () {
+                    $.post('Container_create.action', $("#createFolder").serialize(), function (data) {
+                        //alert('this is the data: '+data);
+                        $("#documentList").empty().append(data);
+                    });
+                    $(this).dialog("close");
+                },
+                "cancel":function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        // define dialogAddFile as JS object
+        $('#dialogAddFile').dialog({
+            autoOpen:false,
+            height:300,
+            width:350,
+            modal:true,
+            buttons:{
+                "upload file":function () {
+                    // can't use .post() because this is a file upload
+                    document.forms['formAddFile'].action = 'Resource_create.action';
+                    document.forms['formAddFile'].target = 'frameAddFile';// iframe
+                    document.forms['formAddFile'].submit();
+                    $(this).dialog("close");
+                    setTimeout(function () {
+                        $.get("Container_getList.action", function (data) {
+                            $('#documentList').empty().append(data);
+                        });
+                    }, 3000)
+                }
+            },
+            "cancel":function () {
+                $(this).dialog("close");
+            }
+        });
+
+        // define dialogAddedFile as JS object
+        $('#dialogAddedFile').dialog({
+            autoOpen:false,
+            height:140,
+            width:350,
+            modal:true,
+            buttons:{
+                "okay":function () {
+                    $(this).dialog("close")
+                }
+            },
+            "cancel":function () {
+                $(this).dialog("close");
+            }
+        })
+
+        // define dialogAddPage as JS object
+        $('#dialogAddPage').dialog({
+            autoOpen:false,
+            height:300,
+            width:350,
+            modal:true,
+            buttons:{
+                "add page":function () {
+                    document.forms['formAddPage'].action = 'Resource_createNotebookPage.action';
+                    document.forms['formAddPage'].target = 'frameAddPage';// iframe
+                    document.forms['formAddPage'].submit();
+                    $(this).dialog("close");
+                    setTimeout(function () {
+                        $.get("Container_getList.action", function (data) {
+                            $('#documentList').empty().append(data)
+                        });
+                    }, 3000)
+                }
+            },
+            "cancel":function () {
+                $(this).dialog("close");
+            }
+        });
+
+        // Left Panel, doc tab, create notebook link
+        $('#openDialogCreateNotebook').click(function () {
+            $('#dialogCreateNotebook').dialog('open');
+            return false;
+        });
+
+        // Left Panel, doc tab, create folder link
+        $('#openDialogCreateFolder').click(function () {
+            $('#dialogCreateFolder').dialog('open');
+            return false;
+        });
+
+        // define dialogCreateNewMessage as JS object
+        $('#dialogCreateNewMessage').dialog({
+            autoOpen:false,
+            width:600,
+            modal:true,
+            buttons:{
+                "send":function () {
+
+                    $(this).dialog("close");
+                    $.post('Message_send.action', $("#createNewMessage").serialize(), function (data) {
+                        //  alert('this is the data: '+ data);
+                    });
+                    // clear all input fields in the form
+                    $('#createNewMessage').find(':input').val('');
+                },
+                "cancel":function () {
+                    $(this).dialog("close");
+                    // clear all input fields in the form
+                    $('#createNewMessage').find(':input').val('');
+                }
+            }
+        });
+
+        // right panel, message tab, create new message link
+        $('#buttonCreateNewMessage').click(function () {
+            $('#dialogCreateNewMessage').dialog('open');
+            $.get("User_getListByFrp.action", function (data) {
+                $('#createNewMessageRecipient').empty().append(data);
+            });
+            return false;
+        });
+
+        //define dialogReplyMessage as JS object
+        $('#dialogReplyMessage').dialog({
+            autoOpen:false,
+            width:600,
+            modal:true,
+            buttons:{
+                "send":function () {
+
+                    //alert('sending message');
+
+                    $.post('Message_send.action', $("#replyMessage").serialize(), function (data) {
+                        //alert('this is the data: ' + data);
+                    });
+                    $(this).dialog("close");
+                    //$('#replyTo').empty();
+                    //$('#replyHidden').empty();
+                },
+                "cancel":function () {
+                    $(this).dialog("close");
+                    $('#replyTo').empty();
+                    $('#replyHidden').empty();
+                }
+            },
+            close:function () {
+                if ($('#replyTo').html()) {
+                    $('#replyTo').empty();
+                    $('#replyHidden').empty();
+                }
+            }
+
+        });
+
+        // define dialogForwardMessage as JS object
+        $('#dialogForwardMessage').dialog({
+            autoOpen:false,
+            width:600,
+            modal:true,
+            buttons:{
+                "send":function () {
+
+                    $(this).dialog("close");
+                    $.post('Message_send.action', $("#forwardMessage").serialize(), function (data) {
+                        //alert('this is the data: ' + data);
+                    });
+                },
+                "cancel":function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        // define dialogShare as JS object
+        $('#dialogShare').dialog({
+            autoOpen:false,
+            width:600,
+            modal:true,
+            buttons:{
+                "share this file":function () {
+
+                    $(this).dialog("close");
+                    $.post('Share_shareInvite.action', $("#shareItemForm").serialize(), function (data) {
+                        //alert('this is the data: ' + data);
+                        //$("#mySentMessage").empty().append(data);
+                    });
+
+
+                },
+                "cancel":function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        // Calendar
+        $('#calendar').datepicker({
+            inline:true
+        });
+
+
+        // Datepicker
+        $('#datepicker').datepicker({
+            inline:true
+        });
+
+        // Slider
+        $('#slider').slider({
+            range:true,
+            values:[17, 67]
+        });
+
+        // Progressbar
+        $("#progressbar").progressbar({
+            value:20
+        });
+
+        //hover states on the static widgets
+        $('#dialog_link, ul#icons li').hover(
+                function () {
+                    $(this).addClass('ui-state-hover');
+                },
+                function () {
+                    $(this).removeClass('ui-state-hover');
+                }
+        );
+
+    });
+
+    // roll-back tooltip
+
+    $('.rollBack img[title]').tooltip({
+        // tweak the position
+        offset:[10, 2],
+
+        // use the "slide" effect
+        effect:'slide'
+    }).dynamic({bottom:{direction:'down', bounce:true}});
+
+    $('.rollBack2 img[title]').tooltip({
+        // tweak the position
+        offset:[10, 2],
+
+        // use the "slide" effect
+        effect:'slide'
+    }).dynamic({bottom:{direction:'down', bounce:true}});
+
+    $('.rollBack3 img[title]').tooltip({
+        // tweak the position
+        offset:[10, 2],
+
+        // use the "slide" effect
+        effect:'slide'
+    }).dynamic({bottom:{direction:'down', bounce:true}});
+
+
+
+
+
+});
+
+
+</script>
+
+<link rel="stylesheet" href="/irisnote/static/css/irisnote04/jquery-ui-1.8.23.custom.css" type="text/css">
+<link rel="stylesheet" href="/irisnote/static/css/irisnote.css" type="text/css">
+
+</head>
+<body>
+

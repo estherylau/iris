@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+-->
+<web-app xmlns="http://caucho.com/ns/resin" xmlns:resin="http://caucho.com/ns/resin/core">
+    <!-- xml -->
+    <system-property javax.xml.parsers.DocumentBuilderFactory="com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl"/>
+    <system-property javax.xml.parsers.SAXParserFactory="com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl"/>
+    <!--  xslt -->
+    <system-property javax.xml.transform.TransformerFactory="com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"/>
+
+    <!-- disable sessions -->
+    <jsp session="false"/>
+    <session-config enable-cookies="true" enable-url-rewriting="false">
+        <session-timeout>240</session-timeout>
+    </session-config>
+
+    <!-- Instruct resin to precompile all jsps on load -->
+    <listener>
+        <listener-class>com.caucho.jsp.JspPrecompileListener</listener-class>
+        <init>
+            <extension>jsp</extension>
+            <extension>jspx</extension>
+        </init>
+    </listener>
+
+    <log name='com.irisnote' level='fine' path='stderr:'
+         timestamp="[%Y-%m-%d %H:%M:%S.%s]"
+         format=" ${log.level} ${log.sourceClassName} ${log.message}"
+            />
+</web-app>

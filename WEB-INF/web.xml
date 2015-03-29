@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_9" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+    <display-name>irisnote</display-name>
+
+    <servlet-mapping>
+        <servlet-name>resin-file</servlet-name>
+        <url-pattern>/static/css/*.css</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>struts2</filter-name>
+        <filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>struts2</filter-name>
+        <url-pattern>/*.action</url-pattern>
+    </filter-mapping>
+
+    <error-page>
+        <error-code>400</error-code>
+        <location>/restError.jsp</location>
+    </error-page>
+
+    <!-- mimetype mapping for serving mobile donwloads -->
+    <mime-mapping>
+        <extension>jad</extension>
+        <mime-type>text/vnd.sun.j2me.app-descriptor</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>cab</extension>
+        <mime-type>application/x-cab-compressed</mime-type>
+    </mime-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <session-config>
+        <session-timeout>120</session-timeout>
+    </session-config>
+</web-app>
+
